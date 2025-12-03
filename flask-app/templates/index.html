@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+</head>
+<body>
+    <h1>Tasks</h1>
+    <a href="/new">+ New Task</a>
+
+    <ul>
+        {% for id, title, done in tasks %}
+            <li>
+                {{ title }} 
+                {% if done %}(done){% endif %}
+                <a href="/edit/{{ id }}">edit</a>
+                <a href="/delete/{{ id }}">delete</a>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

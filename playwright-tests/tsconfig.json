@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "rootDir": "./",
+    "outDir": "./dist",
+    "module": "esnext",
+    "target": "esnext",
+    "lib": ["esnext"],
+    "types": ["node", "@playwright/test"],
+    "sourceMap": true,
+    "declaration": false,
+
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node"
+  },
+  "include": ["tests/**/*.ts"]
+}

@@ -1,21 +1,39 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
-</head>
-<body>
-    <h1>Tasks</h1>
-    <a href="/new">+ New Task</a>
+  <head>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <div class="container-md">
+      <h1>Tasks</h1>
+      <a class="btn btn-primary" style="margin-bottom: 15px" href="/new"
+        >+ New Task</a
+      >
 
-    <ul>
+      <ul class="list-group">
         {% for id, title, done in tasks %}
-            <li>
-                {{ title }} 
-                {% if done %}(done){% endif %}
-                <a href="/edit/{{ id }}">edit</a>
-                <a href="/delete/{{ id }}">delete</a>
-            </li>
+        <li class="list-group-item p-2">
+          {{ title }} {% if done %}(done){% endif %}
+          <a
+            class="btn btn-secondary p-2"
+            href="/delete/{{ id }}"
+            style="float: right"
+            >delete</a
+          >
+          <a
+            class="btn btn-primary p-2"
+            href="/edit/{{ id }}"
+            style="float: right; margin-right: 0.5em"
+            >edit</a
+          >
+        </li>
         {% endfor %}
-    </ul>
-</body>
+      </ul>
+    </div>
+  </body>
 </html>

@@ -52,6 +52,9 @@ def load_user(user_id):
 # -----------------------------
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for("index"))
+
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
@@ -129,6 +132,16 @@ def edit(task_id):
 
 
 # -----------------------------
+# タスク編集（認証必須）_IDなしの場合リダイレクト
+# -----------------------------
+@app.route("/edit")
+def edit_no_id():
+    if not current_user.is_authenticated:
+        return redirect(url_for("login"))
+    return redirect(url_for("index"))
+
+
+# -----------------------------
 # タスク削除（認証必須）
 # -----------------------------
 @app.route("/delete/<int:task_id>")
@@ -140,6 +153,16 @@ def delete(task_id):
 
 if __name__ == "__main__":
     app.run(debug=True, port=5100)
+
+
+# -----------------------------
+# タスク削除（認証必須）_IDなしの場合リダイレクト
+# -----------------------------
+@app.route("/delete")
+def delete_no_id():
+    if not current_user.is_authenticated:
+        return redirect(url_for("login"))
+    return redirect(url_for("index"))
 
 
 # -----------------------------

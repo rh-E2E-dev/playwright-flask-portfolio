@@ -34,12 +34,17 @@ def init_db():
         )
 
         # testuser を初回だけ投入
-        c.execute("SELECT COUNT(*) FROM users WHERE username = 'testuser'")
-        if c.fetchone()[0] == 0:
-            c.execute(
-                "INSERT INTO users (username, password) VALUES (?, ?)",
-                ('testuser', 'password123')
-            )
+        def ensure_user(username, password):
+            c.execute("SELECT COUNT(*) FROM users WHERE username = ?", (username,))
+            if c.fetchone()[0] == 0:
+                c.execute(
+                    "INSERT INTO users (username, password) VALUES (?, ?)",
+                    (username, password)
+                )
+
+        # 追加
+        ensure_user("test1", "pass123")
+        ensure_user("テスト2", "pass456")
 
         conn.commit()
 

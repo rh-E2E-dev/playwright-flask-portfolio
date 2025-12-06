@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_login import (
     LoginManager,
     login_user,
@@ -140,3 +140,32 @@ def delete(task_id):
 
 if __name__ == "__main__":
     app.run(debug=True, port=5100)
+
+
+# -----------------------------
+# マイページ
+# -----------------------------
+@app.route("/mypage")
+@login_required
+def mypage():
+    return render_template("mypage.html")
+
+
+# -----------------------------
+# API：Stats
+# -----------------------------
+@app.route("/api/stats")
+@login_required
+def api_stats():
+    user_id = current_user.id
+
+    total = db.count_tasks_by_user(user_id)
+    done = db.count_done_tasks_by_user(user_id)
+
+    done_rate = done / total if total > 0 else 0
+
+    return jsonify({
+        "username": current_user.username,
+        "task_count": total,
+        "done_rate": done_rate
+    })

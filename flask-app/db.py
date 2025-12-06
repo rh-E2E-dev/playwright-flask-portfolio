@@ -107,3 +107,22 @@ def delete_task(task_id, user_id):
             (task_id, user_id)
         )
         conn.commit()
+
+
+# -------------------------
+# ユーザーごとのタスク総数を返す
+# -------------------------
+def count_tasks_by_user(user_id):
+    with closing(get_connection()) as conn:
+        c = conn.cursor()
+        c.execute("SELECT COUNT(*) FROM tasks WHERE user_id = ?", (user_id,))
+        return c.fetchone()[0]
+
+# -------------------------
+# 完了済みタスク数
+# -------------------------
+def count_done_tasks_by_user(user_id):
+    with closing(get_connection()) as conn:
+        c = conn.cursor()
+        c.execute("SELECT COUNT(*) FROM tasks WHERE user_id = ? AND done = 1", (user_id,))
+        return c.fetchone()[0]

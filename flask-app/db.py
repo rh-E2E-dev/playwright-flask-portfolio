@@ -1,91 +1,109 @@
-# sqliteを操作するための標準ライブラリ
 import sqlite3
-# with文の中で「終わったら閉じる」を自動化するツール
 from contextlib import closing
 
-# このファイルがDB本体。なければ作成される。
 DB_NAME = "tasks.db"
 
-# DBに接続する。
 def get_connection():
-    # 返り値はconnectionオブジェクト
     return sqlite3.connect(DB_NAME)
 
-
-'''
-with closing(接続) as conn:
-    # この中でSQLを実行する
-# ここを出たら自動で接続を閉じる
-
-普通なら：
-conn = get_connection()
-try:
-    # SQL実行
-finally:
-    conn.close()
-…って書くものを、
-1行でスッキリ書けるようにしただけ。
-'''
-# 初期化（テーブルを作るフェーズ）
 def init_db():
     with closing(get_connection()) as conn:
-        # cursor() = SQL発行するためのペン
-        # データベースに対して何か処理を実行するためにはデータベースカーソルを使用する必要があります。
-        # そのため、以下のようにカーソルオブジェクトを生成します。
         c = conn.cursor()
 
-        # Cursor#execute()メソッド = SQLを投げる
+        # tasks テーブル：user_id を追加
         c.execute(
             """
             CREATE TABLE IF NOT EXISTS tasks (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 title TEXT NOT NULL,
-                done INTEGER NOT NULL DEFAULT 0
+                done INTEGER NOT NULL DEFAULT 0,
+                user_id INTEGER
             );
             """
         )
 
-        # Cursor#commit()メソッド = DBへの反映
+        # users テーブル
+        c.execute(
+            """
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT NOT NULL UNIQUE,
+                password TEXT NOT NULL
+            );
+            """
+        )
+
+        # testuser を初回だけ投入
+        c.execute("SELECT COUNT(*) FROM users WHERE username = 'testuser'")
+        if c.fetchone()[0] == 0:
+            c.execute(
+                "INSERT INTO users (username, password) VALUES (?, ?)",
+                ('testuser', 'password123')
+            )
+
         conn.commit()
 
-# SELECT（一覧取得）
-def fetch_all():
-    with closing(get_connection()) as conn:
-        c = conn.cursor()
-        c.execute("SELECT id, title, done FROM tasks ORDER BY id DESC")
-        
-        # Cursor#fetchall()メソッド = すべての行をPythonのリストとして返す
-        # 例：[(1, "買い物", 0), (2, "掃除", 1), …]
-        return c.fetchall()
 
-# INSERT
-def add_task(title):
-    with closing(get_connection()) as conn:
-        c = conn.cursor()
-        c.execute("INSERT INTO tasks (title) VALUES (?)", (title,))
-        '''???????????
-        ここでの (title,) が初心者嫌がらせポイントだけど、
-        1要素のタプルを書かなきゃいけないルール。
-        '''
-        conn.commit()
-
-def get_task(task_id):
-    with closing(get_connection()) as conn:
-        c = conn.cursor()
-        c.execute("SELECT id, title, done FROM tasks WHERE id = ?", (task_id,))
-        return c.fetchone()
-
-def update_task(task_id, title, done):
+# -------------------------
+# ユーザーごとの一覧取得
+# -------------------------
+def fetch_all_by_user(user_id):
     with closing(get_connection()) as conn:
         c = conn.cursor()
         c.execute(
-            "UPDATE tasks SET title = ?, done = ? WHERE id = ?",
-            (title, done, task_id),
+            "SELECT id, title, done FROM tasks WHERE user_id = ? ORDER BY id DESC",
+            (user_id,)
+        )
+        return c.fetchall()
+
+
+# -------------------------
+# INSERT
+# -------------------------
+def add_task(title, user_id):
+    with closing(get_connection()) as conn:
+        c = conn.cursor()
+        c.execute(
+            "INSERT INTO tasks (title, user_id) VALUES (?, ?)",
+            (title, user_id)
         )
         conn.commit()
 
-def delete_task(task_id):
+
+# -------------------------
+# 1件取得（他人のタスクは取れない）
+# -------------------------
+def get_task(task_id, user_id):
     with closing(get_connection()) as conn:
         c = conn.cursor()
-        c.execute("DELETE FROM tasks WHERE id = ?", (task_id,))
+        c.execute(
+            "SELECT id, title, done FROM tasks WHERE id = ? AND user_id = ?",
+            (task_id, user_id)
+        )
+        return c.fetchone()
+
+
+# -------------------------
+# UPDATE
+# -------------------------
+def update_task(task_id, title, done, user_id):
+    with closing(get_connection()) as conn:
+        c = conn.cursor()
+        c.execute(
+            "UPDATE tasks SET title = ?, done = ? WHERE id = ? AND user_id = ?",
+            (title, done, task_id, user_id)
+        )
+        conn.commit()
+
+
+# -------------------------
+# DELETE
+# -------------------------
+def delete_task(task_id, user_id):
+    with closing(get_connection()) as conn:
+        c = conn.cursor()
+        c.execute(
+            "DELETE FROM tasks WHERE id = ? AND user_id = ?",
+            (task_id, user_id)
+        )
         conn.commit()

@@ -59,6 +59,12 @@ def login():
         username = request.form.get("username")
         password = request.form.get("password")
 
+        if not username or not password:
+            return render_template(
+                "login.html", 
+                error="ユーザー名とパスワードを入力してください"
+            )
+
         conn = sqlite3.connect("tasks.db")
         c = conn.cursor()
         c.execute(

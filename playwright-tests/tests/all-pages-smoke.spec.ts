@@ -1,5 +1,7 @@
 import { test, expect, Page } from '@playwright/test';
 
+// getOrCreateTask(page: Page)を修正したほうがよい。EditURLを使っていない
+
 const redirectExcapes = {
   root: '%2F',
   new: '%2Fnew',
@@ -14,6 +16,10 @@ test.describe('未ログイン：リダイレクト', () => {
     test('タスク一覧画面', async ({ page }) => {
       await page.goto(`${process.env.BASE_URL!}/`);
       await expect(page).toHaveURL(`${process.env.BASE_URL!}/login?next=${redirectExcapes.root}`);
+    });
+    test('タスク新規作成', async ({ page }) => {
+      await page.goto(`${process.env.BASE_URL!}/new`);
+      await expect(page).toHaveURL(`${process.env.BASE_URL!}/login?next=${redirectExcapes.new}`);
     });
     test('タスク編集画面：ID有', async ({ page }) => {
       await page.goto(`${process.env.BASE_URL!}/edit/1`);
@@ -47,7 +53,7 @@ test.describe('未ログイン：リダイレクト', () => {
 });
 
 test.describe('ログイン済み', () => {
-  test.use({ storageState: '../playwright/.auth/user1.json' });
+  test.use({ storageState: './playwright/.auth/user1.json' });
 
   async function getOrCreateTask(page: Page) {
     await page.goto(`${process.env.BASE_URL!}/`);
@@ -93,6 +99,14 @@ test.describe('ログイン済み', () => {
       await page.goto(`${process.env.BASE_URL!}/`);
       await expect(page).toHaveURL(`${process.env.BASE_URL!}/`);
     });
+    test('ログイン画面', async ({ page }) => {
+      await page.goto(`${process.env.BASE_URL!}/login`);
+      await expect(page).toHaveURL(`${process.env.BASE_URL!}/`);
+    });
+    test('タスク新規作成', async ({ page }) => {
+      await page.goto(`${process.env.BASE_URL!}/new`);
+      await expect(page).toHaveURL(`${process.env.BASE_URL!}/new`);
+    });
     test('タスク編集画面：ID有', async ({ page }) => {
       const { editURL } = await getOrCreateTask(page);
       await page.goto(`${process.env.BASE_URL!}${editURL}`);
@@ -123,6 +137,7 @@ test.describe('ログイン済み', () => {
     test('ログアウト', async ({ page }) => {
       await page.goto(`${process.env.BASE_URL!}/logout`);
       await expect(page).toHaveURL(`${process.env.BASE_URL!}/login`);
+      // ログアウト状態であれば、ルートにアクセスしてもログイン画面にリダイレクトされることを確認
       await page.goto(`${process.env.BASE_URL!}/`);
       await expect(page).toHaveURL(`${process.env.BASE_URL!}/login?next=${redirectExcapes.root}`);
     });

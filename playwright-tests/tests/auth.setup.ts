@@ -8,7 +8,7 @@ setup('ログイン認証保持：ユーザー1', async ({ page }) => {
 
   await expect(page).toHaveURL(`${process.env.BASE_URL!}/`);
 
-  await page.context().storageState({ path: '../playwright/.auth/user1.json' });
+  await page.context().storageState({ path: './playwright/.auth/user1.json' });
 });
 
 setup('ログイン認証保持：ユーザー2', async ({ page }) => {
@@ -19,5 +19,5 @@ setup('ログイン認証保持：ユーザー2', async ({ page }) => {
 
   await expect(page).toHaveURL(`${process.env.BASE_URL!}/`);
 
-  await page.context().storageState({ path: '../playwright/.auth/user2.json' });
+  await page.context().storageState({ path: './playwright/.auth/user2.json' });
 });

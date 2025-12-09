@@ -112,6 +112,11 @@ def index():
 def new():
     if request.method == "POST":
         title = request.form.get("title")
+        if not title:
+            return render_template(
+                "new.html", 
+                error="タスクを入力してください"
+            )
         if title:
             db.add_task(title, current_user.id)
         return redirect(url_for("index"))

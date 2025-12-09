@@ -1,4 +1,5 @@
-import { test, expect, Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
+import { getOrCreateTask, getExistingTaskIds } from '../helpers/tasks';
 
 // getOrCreateTask(page: Page)を修正したほうがよい。EditURLを使っていない
 
@@ -53,46 +54,7 @@ test.describe('未ログイン：リダイレクト', () => {
 });
 
 test.describe('ログイン済み', () => {
-  test.use({ storageState: './playwright/.auth/user1.json' });
-
-  async function getOrCreateTask(page: Page) {
-    await page.goto(`${process.env.BASE_URL!}/`);
-    const editLinks = page.getByRole('link', { name: '編集' });
-    const deleteLinks = page.getByRole('link', { name: '削除' });
-
-    const count = await editLinks.count();
-
-    if (count > 0) {
-      return {
-        editURL: await editLinks.first().getAttribute('href'),
-        deleteURL: await deleteLinks.first().getAttribute('href'),
-      };
-    }
-
-    await page.goto(`${process.env.BASE_URL!}/new`);
-    await page
-      .getByRole('textbox', { name: '入力してください' })
-      .fill('自動テストで追加したタスク');
-    await page.getByRole('button', { name: '作成' }).click();
-
-    await page.goto(`${process.env.BASE_URL!}/`);
-    return {
-      editURL: await editLinks.first().getAttribute('href'),
-      deleteURL: await deleteLinks.first().getAttribute('href'),
-    };
-  }
-
-  async function getExistingTaskIds(page: Page) {
-    const links = await page.getByRole('link', { name: '編集' }).all();
-
-    const ids = [];
-    for (const link of links) {
-      const href = await link.getAttribute('href');
-      if (!href) continue;
-      ids.push(href.split('/').pop());
-    }
-    return ids.map((id) => Number(id));
-  }
+  test.use({ storageState: '.auth/user1.json' });
 
   test.describe('画面遷移', () => {
     test('タスク一覧画面', async ({ page }) => {

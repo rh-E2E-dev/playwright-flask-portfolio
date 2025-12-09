@@ -11,14 +11,12 @@
   <body>
     <div class="container-md">
       <h1>新規作成</h1>
+      {% if error %}
+      <p style="color: red">{{ error }}</p>
+      {% endif %}
 
       <form method="POST">
-        <input
-          class="form-label"
-          name="title"
-          placeholder="入力してください"
-          required
-        />
+        <input class="form-label" name="title" placeholder="入力してください" />
         <button class="btn btn-primary" type="submit">作成</button>
       </form>
     </div>

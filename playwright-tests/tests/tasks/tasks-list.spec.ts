@@ -1,57 +1,14 @@
-import { test, expect, Page } from '@playwright/test';
-
-/*
-TODO:
-下記の検討: {
-    fixtures 化した綺麗な版
-    ヘルパー関数を共通ファイル化したプロジェクト構造案
-    https://chatgpt.com/c/693548c5-f408-8321-8109-e5a04fe5fb9e
-}
-*/
-async function createTask(page: Page, taskText?: string) {
-  await page.goto(`${process.env.BASE_URL!}/new`);
-  if (taskText) {
-    await page.getByRole('textbox', { name: '入力してください' }).fill(taskText);
-  } else {
-    await page
-      .getByRole('textbox', { name: '入力してください' })
-      .fill('自動テストで追加したタスク');
-  }
-  await page.getByRole('button', { name: '作成' }).click();
-  await page.waitForURL(`${process.env.BASE_URL!}/`);
-}
-
-async function deleteAllTasks(page: Page) {
-  await page.goto(`${process.env.BASE_URL!}/`);
-  const deleteButtons = page.getByRole('link', { name: '削除' });
-  const count = await deleteButtons.count();
-
-  for (let i = 0; i < count; i++) {
-    await deleteButtons.nth(0).click();
-    await page.waitForLoadState();
-  }
-}
-
-async function getExistingTaskIds(page: Page) {
-  const editLinks = page.getByRole('link', { name: '編集' });
-  const count = await editLinks.count();
-  const ids = [];
-
-  for (let i = 0; i < count; i++) {
-    const href = await editLinks.nth(i).getAttribute('href');
-    ids.push(Number(href!.split('/').pop()));
-  }
-  return ids;
-}
+import { test, expect } from '@playwright/test';
+import { createTask, deleteAllTasks, getExistingTaskIds } from '../helpers/tasks';
 
 test.describe('タスク一覧画面', () => {
   test.describe('表示', () => {
-    test.use({ storageState: './playwright/.auth/user1.json' });
+    test.use({ storageState: '.auth/user1.json' });
     test('基本要素', async ({ page }) => {
       await page.goto(`${process.env.BASE_URL!}/`);
       await expect(page.getByRole('link', { name: 'My Page' })).toBeVisible();
       await expect(page.getByRole('link', { name: 'Logout' })).toBeVisible();
-      await expect(page.getByRole('heading', { name: 'タスク一覧' })).toHaveText('タスク一覧');
+      await expect(page.getByRole('heading', { name: 'タスク一覧' })).toBeVisible();
       await expect(page.getByRole('link', { name: '+ 新規作成' })).toBeVisible();
     });
     test.describe('一覧表示', () => {
@@ -70,25 +27,29 @@ test.describe('タスク一覧画面', () => {
     });
   });
   test.describe('他人のタスクが表示されていないか？', () => {
+    const task = 'ユーザー4のタスク';
+
     test.describe('事前準備', () => {
-      test.use({ storageState: './playwright/.auth/user2.json' });
-      test('ユーザー2でタスク作成', async ({ page }) => {
-        await createTask(page, 'ユーザー2のタスク');
+      test.use({ storageState: '.auth/user4.json' });
+      test('ユーザー4でタスク作成', async ({ page }) => {
+        await createTask(page, task);
         await page.goto(`${process.env.BASE_URL!}/`);
-        const count = await page.getByText('ユーザー2のタスク').count();
+        const count = await page.getByText(task).count();
         expect(count).toBeGreaterThan(0);
       });
     });
+
     test.describe('表示確認', () => {
-      test.use({ storageState: './playwright/.auth/user1.json' });
-      test('ユーザー1の一覧を確認', async ({ page }) => {
+      test.use({ storageState: '.auth/user3.json' });
+      test('ユーザー3の一覧を確認', async ({ page }) => {
         await page.goto(`${process.env.BASE_URL!}/`);
-        await expect(page.getByText('ユーザー2のタスク')).not.toBeVisible();
+        await expect(page.getByText(task)).toHaveCount(0);
       });
     });
   });
+
   test.describe('基本動作', () => {
-    test.use({ storageState: './playwright/.auth/user1.json' });
+    test.use({ storageState: '.auth/user3.json' });
     test('新規作成ボタン', async ({ page }) => {
       await page.goto(`${process.env.BASE_URL!}/`);
       await page.getByRole('link', { name: '+ 新規作成' }).click();
@@ -112,6 +73,31 @@ test.describe('タスク一覧画面', () => {
 
       // テストに利用したタスクを削除
       await page.goto(`${process.env.BASE_URL!}/delete/${id}`);
+    });
+    test('削除ボタン', async ({ page }) => {
+      const task = '削除ボタンテストタスク';
+      await createTask(page, task);
+
+      await page.goto(`${process.env.BASE_URL!}/`);
+      const deleteTarget = page.locator('.list-group-item').filter({ hasText: task });
+      await expect(deleteTarget).toHaveCount(1);
+
+      await deleteTarget.getByRole('link', { name: '削除' }).click();
+      await page.waitForURL(`${process.env.BASE_URL!}/`);
+      await expect(deleteTarget).toHaveCount(0);
+    });
+    test('マイページボタン', async ({ page }) => {
+      await page.goto(`${process.env.BASE_URL!}/`);
+      await page.getByRole('link', { name: 'My Page' }).click();
+      await page.waitForURL(`${process.env.BASE_URL!}/mypage`);
+      await expect(page.getByRole('heading', { name: 'マイページ' })).toBeVisible();
+    });
+    test('ログアウトボタン', async ({ page }) => {
+      await page.goto(`${process.env.BASE_URL!}/`);
+      await page.getByRole('link', { name: 'Logout' }).click();
+      await page.waitForURL(`${process.env.BASE_URL!}/login`);
+      await page.goto(`${process.env.BASE_URL!}/`);
+      await expect(page).toHaveURL(`${process.env.BASE_URL!}/login?next=%2F`);
     });
   });
 });

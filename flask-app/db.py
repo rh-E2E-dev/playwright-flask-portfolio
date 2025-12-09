@@ -42,9 +42,12 @@ def init_db():
                     (username, password)
                 )
 
-        # 追加
+        # 追加処理
         ensure_user("test1", "pass123")
         ensure_user("テスト2", "pass456")
+        ensure_user("test3", "pass123")
+        ensure_user("test4", "pass123")
+        ensure_user("test5", "pass123")
 
         conn.commit()
 

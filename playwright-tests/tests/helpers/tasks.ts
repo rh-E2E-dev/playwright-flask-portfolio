@@ -1,4 +1,4 @@
-import { Page, expect } from '@playwright/test';
+import { Page } from '@playwright/test';
 
 export async function createTask(page: Page, taskText?: string) {
   await page.goto(`${process.env.BASE_URL!}/new`);

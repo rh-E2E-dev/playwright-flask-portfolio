@@ -48,6 +48,10 @@ def init_db():
         ensure_user("test3", "pass123")
         ensure_user("test4", "pass123")
         ensure_user("test5", "pass123")
+        ensure_user("test6", "pass123")
+        ensure_user("test7", "pass123")
+        ensure_user("test8", "pass123")
+        ensure_user("test9", "pass123")
 
         conn.commit()
 

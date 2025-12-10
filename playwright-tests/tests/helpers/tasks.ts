@@ -13,6 +13,30 @@ export async function createTask(page: Page, taskText?: string) {
   await page.waitForURL(`${process.env.BASE_URL!}/`);
 }
 
+export async function updateTaskDoneStatus(page: Page, taskText: string, isDone: boolean) {
+  // 一覧で編集対象のリンクとIDを取得 → 編集画面へ遷移
+  await page.goto(`${process.env.BASE_URL!}/`);
+  const editTarget = page
+    .locator('.list-group-item')
+    .filter({ hasText: taskText })
+    .getByRole('link', { name: '編集' });
+  const href = await editTarget.getAttribute('href');
+  const id = Number(href!.split('/').pop());
+  await editTarget.click();
+  await page.waitForURL(`${process.env.BASE_URL!}/edit/${id}`);
+
+  if (isDone) {
+    // タスク完了済みにして編集画面を再度表示する
+    await page.getByRole('checkbox', { name: 'done' }).check();
+    await page.getByRole('button', { name: '更新' }).click();
+    await page.waitForURL(`${process.env.BASE_URL!}/`);
+  } else {
+    await page.getByRole('checkbox', { name: 'done' }).uncheck();
+    await page.getByRole('button', { name: '更新' }).click();
+    await page.waitForURL(`${process.env.BASE_URL!}/`);
+  }
+}
+
 export async function deleteTask(page: Page, taskText: string) {
   await page.goto(`${process.env.BASE_URL!}/`);
   const deleteTarget = page

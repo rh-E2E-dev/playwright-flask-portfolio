@@ -12,7 +12,7 @@ test.describe('マイページ', () => {
       await expect(page.getByRole('heading', { name: 'マイページ' })).toBeVisible();
       await expect(page.getByRole('link', { name: '← 戻る' })).toBeVisible();
       await expect(page.getByText('ユーザー名：')).toBeVisible();
-      await expect(page.getByText(process.env.USER6_NAME!)).toBeVisible();
+      await expect(page.getByText(process.env.NAME_user6!)).toBeVisible();
       await expect(page.getByText('タスク総数：')).toBeVisible();
       await expect(page.getByText('完了率：')).toBeVisible();
     });

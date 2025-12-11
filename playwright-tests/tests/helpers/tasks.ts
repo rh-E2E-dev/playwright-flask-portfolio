@@ -1,9 +1,9 @@
 import { Page } from '@playwright/test';
 
-export async function createTask(page: Page, taskText?: string) {
+export async function createTask(page: Page, taskName?: string) {
   await page.goto(`${process.env.BASE_URL!}/new`);
-  if (taskText) {
-    await page.getByRole('textbox', { name: '入力してください' }).fill(taskText);
+  if (taskName) {
+    await page.getByRole('textbox', { name: '入力してください' }).fill(taskName);
   } else {
     await page
       .getByRole('textbox', { name: '入力してください' })
@@ -13,12 +13,12 @@ export async function createTask(page: Page, taskText?: string) {
   await page.waitForURL(`${process.env.BASE_URL!}/`);
 }
 
-export async function updateTaskDoneStatus(page: Page, taskText: string, isDone: boolean) {
+export async function updateTaskDoneStatus(page: Page, taskName: string, isDone: boolean) {
   // 一覧で編集対象のリンクとIDを取得 → 編集画面へ遷移
   await page.goto(`${process.env.BASE_URL!}/`);
   const editTarget = page
     .locator('.list-group-item')
-    .filter({ hasText: taskText })
+    .filter({ hasText: taskName })
     .getByRole('link', { name: '編集' });
   const href = await editTarget.getAttribute('href');
   const id = Number(href!.split('/').pop());
@@ -37,11 +37,11 @@ export async function updateTaskDoneStatus(page: Page, taskText: string, isDone:
   }
 }
 
-export async function deleteTask(page: Page, taskText: string) {
+export async function deleteTask(page: Page, taskName: string) {
   await page.goto(`${process.env.BASE_URL!}/`);
   const deleteTarget = page
     .locator('.list-group-item')
-    .filter({ hasText: taskText })
+    .filter({ hasText: taskName })
     .getByRole('link', { name: '削除' });
   const href = await deleteTarget.getAttribute('href');
   const id = Number(href!.split('/').pop());
@@ -72,27 +72,16 @@ export async function getExistingTaskIds(page: Page) {
   return ids;
 }
 
-export async function getOrCreateTask(page: Page) {
+export async function getEditTarget(page: Page, taskName: string) {
   await page.goto(`${process.env.BASE_URL!}/`);
-  const editLinks = page.getByRole('link', { name: '編集' });
-  const deleteLinks = page.getByRole('link', { name: '削除' });
-
-  const count = await editLinks.count();
-
-  if (count > 0) {
-    return {
-      editURL: await editLinks.first().getAttribute('href'),
-      deleteURL: await deleteLinks.first().getAttribute('href'),
-    };
-  }
-
-  await page.goto(`${process.env.BASE_URL!}/new`);
-  await page.getByRole('textbox', { name: '入力してください' }).fill('自動テストで追加したタスク');
-  await page.getByRole('button', { name: '作成' }).click();
-
-  await page.goto(`${process.env.BASE_URL!}/`);
+  const editTarget = page
+    .locator('.list-group-item')
+    .filter({ hasText: taskName })
+    .getByRole('link', { name: '編集' });
+  const href = await editTarget.getAttribute('href');
+  const id = Number(href!.split('/').pop());
   return {
-    editURL: await editLinks.first().getAttribute('href'),
-    deleteURL: await deleteLinks.first().getAttribute('href'),
+    editTarget,
+    id,
   };
 }

@@ -1,21 +1,16 @@
 import { test, expect } from '@playwright/test';
-import { createTask, deleteTask } from '../helpers/tasks';
+import { createTask, deleteTask, getEditTarget } from '../helpers/tasks';
 
 test.describe('タスク編集画面', () => {
   test.use({ storageState: '.auth/user5.json' });
   test.describe('表示', () => {
-    test('未完了タスク', async ({ page }) => {
+    test('未完了タスクの編集画面の表示が正しいこと', async ({ page }) => {
       const task = '編集画面表示確認のタスク_未完了タスク：ユーザー5';
       await createTask(page, task);
 
       // 一覧で編集対象のリンクとIDを取得 → 編集画面へ遷移
       await page.goto(`${process.env.BASE_URL!}/`);
-      const editTarget = page
-        .locator('.list-group-item')
-        .filter({ hasText: task })
-        .getByRole('link', { name: '編集' });
-      const href = await editTarget.getAttribute('href');
-      const id = Number(href!.split('/').pop());
+      const { editTarget, id } = await getEditTarget(page, task);
       await editTarget.click();
       await page.waitForURL(`${process.env.BASE_URL!}/edit/${id}`);
 
@@ -26,18 +21,13 @@ test.describe('タスク編集画面', () => {
 
       await deleteTask(page, task);
     });
-    test('完了済みタスク', async ({ page }) => {
+    test('完了済みタスクの編集画面の表示が正しいこと', async ({ page }) => {
       const task = '編集画面表示確認のタスク_完了済みタスク：ユーザー5';
       await createTask(page, task);
 
       // 一覧で編集対象のリンクとIDを取得 → 編集画面へ遷移
       await page.goto(`${process.env.BASE_URL!}/`);
-      const editTarget = page
-        .locator('.list-group-item')
-        .filter({ hasText: task })
-        .getByRole('link', { name: '編集' });
-      const href = await editTarget.getAttribute('href');
-      const id = Number(href!.split('/').pop());
+      const { editTarget, id } = await getEditTarget(page, task);
       await editTarget.click();
       await page.waitForURL(`${process.env.BASE_URL!}/edit/${id}`);
 
@@ -57,20 +47,15 @@ test.describe('タスク編集画面', () => {
     });
   });
 
-  test.describe('動作', () => {
+  test.describe('動作（正常系）', () => {
     test.describe('完了チェック', () => {
-      test('未完了 → 完了', async ({ page }) => {
+      test('未完了 → 完了に更新できること', async ({ page }) => {
         const task = '編集画面動作確認のタスク_未完了→完了：ユーザー5';
         await createTask(page, task);
 
         // 一覧で編集対象のリンクとIDを取得 → 編集画面へ遷移
         await page.goto(`${process.env.BASE_URL!}/`);
-        const editTarget = page
-          .locator('.list-group-item')
-          .filter({ hasText: task })
-          .getByRole('link', { name: '編集' });
-        const href = await editTarget.getAttribute('href');
-        const id = Number(href!.split('/').pop());
+        const { editTarget, id } = await getEditTarget(page, task);
         await editTarget.click();
         await page.waitForURL(`${process.env.BASE_URL!}/edit/${id}`);
 
@@ -88,8 +73,7 @@ test.describe('タスク編集画面', () => {
         await expect(page.getByText(`${task} (done)`)).toHaveCount(1);
         await deleteTask(page, task);
       });
-
-      test('完了 → 未完了', async ({ page }) => {
+      test('完了 → 未完了に更新できること', async ({ page }) => {
         const task = '編集画面動作確認のタスク_完了→未完了：ユーザー5';
         await createTask(page, task);
 
@@ -134,19 +118,14 @@ test.describe('タスク編集画面', () => {
     });
 
     test.describe('タスク名変更', () => {
-      test('未完了タスク', async ({ page }) => {
+      test('未完了タスクのタスク名を変更できること', async ({ page }) => {
         const task = '編集画面動作確認のタスク_未完了のタスク名変更：ユーザー5';
         const changedTask = '編集画面動作確認のタスク_未完了のタスク名変更：user5';
 
         // 一覧で編集対象のリンクとIDを取得 → 編集画面へ遷移
         await createTask(page, task);
         await page.goto(`${process.env.BASE_URL!}/`);
-        const editTarget = page
-          .locator('.list-group-item')
-          .filter({ hasText: task })
-          .getByRole('link', { name: '編集' });
-        const href = await editTarget.getAttribute('href');
-        const id = Number(href!.split('/').pop());
+        const { editTarget, id } = await getEditTarget(page, task);
         await editTarget.click();
         await page.waitForURL(`${process.env.BASE_URL!}/edit/${id}`);
 
@@ -163,12 +142,10 @@ test.describe('タスク編集画面', () => {
         await expect(page.getByText(changedTask)).toHaveCount(1);
 
         // 一覧で編集対象のリンクとIDを取得 → 編集画面へ遷移
-        const changedEditTarget = page
-          .locator('.list-group-item')
-          .filter({ hasText: changedTask })
-          .getByRole('link', { name: '編集' });
-        const changedHref = await changedEditTarget.getAttribute('href');
-        const changedId = Number(changedHref!.split('/').pop());
+        const { editTarget: changedEditTarget, id: changedId } = await getEditTarget(
+          page,
+          changedTask,
+        );
         await changedEditTarget.click();
         await page.waitForURL(`${process.env.BASE_URL!}/edit/${changedId}`);
 
@@ -177,19 +154,14 @@ test.describe('タスク編集画面', () => {
 
         await deleteTask(page, changedTask);
       });
-      test('完了済みタスク', async ({ page }) => {
+      test('完了済みタスクのタスク名を変更できること', async ({ page }) => {
         const task = '編集画面動作確認のタスク_完了済みのタスク名変更：ユーザー5';
         const changedTask = '編集画面動作確認のタスク_完了済みのタスク名変更：user5';
         await createTask(page, task);
 
         // 一覧で編集対象のリンクとIDを取得 → 編集画面へ遷移
         await page.goto(`${process.env.BASE_URL!}/`);
-        const editTarget = page
-          .locator('.list-group-item')
-          .filter({ hasText: task })
-          .getByRole('link', { name: '編集' });
-        const href = await editTarget.getAttribute('href');
-        const id = Number(href!.split('/').pop());
+        const { editTarget, id } = await getEditTarget(page, task);
         await editTarget.click();
         await page.waitForURL(`${process.env.BASE_URL!}/edit/${id}`);
 
@@ -218,12 +190,10 @@ test.describe('タスク編集画面', () => {
         await expect(page.getByText(`${changedTask} (done)`)).toHaveCount(1);
 
         // 一覧で編集対象のリンクとIDを取得 → 編集画面へ遷移
-        const changedEditTarget = page
-          .locator('.list-group-item')
-          .filter({ hasText: changedTask })
-          .getByRole('link', { name: '編集' });
-        const changedHref = await changedEditTarget.getAttribute('href');
-        const changedId = Number(changedHref!.split('/').pop());
+        const { editTarget: changedEditTarget, id: changedId } = await getEditTarget(
+          page,
+          changedTask,
+        );
         await changedEditTarget.click();
         await page.waitForURL(`${process.env.BASE_URL!}/edit/${changedId}`);
 
@@ -232,6 +202,29 @@ test.describe('タスク編集画面', () => {
 
         await deleteTask(page, changedTask);
       });
+    });
+  });
+  test.describe('動作（異常系）', () => {
+    test('タスク名を未入力で未入力エラーが表示されること', async ({ page }) => {
+      const task = '編集画面動作確認のタスク_未入力：ユーザー5';
+
+      // 一覧で編集対象のリンクとIDを取得 → 編集画面へ遷移
+      await createTask(page, task);
+      await page.goto(`${process.env.BASE_URL!}/`);
+      const { editTarget, id } = await getEditTarget(page, task);
+      await editTarget.click();
+      await page.waitForURL(`${process.env.BASE_URL!}/edit/${id}`);
+
+      // タスク名を空にして更新
+      await page.getByRole('textbox').clear();
+      await page.getByRole('button', { name: '更新' }).click();
+      await expect(page.getByText('タスクを入力してください')).toBeVisible();
+
+      // 一覧画面で当該タスクの変更が反映されていないことを確認
+      await page.goto(`${process.env.BASE_URL!}/`);
+      await expect(page.getByText(task)).toHaveCount(1);
+
+      await deleteTask(page, task);
     });
   });
 });

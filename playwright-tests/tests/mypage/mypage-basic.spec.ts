@@ -4,7 +4,7 @@ import { createTask, updateTaskDoneStatus, deleteTask, deleteAllTasks } from '..
 test.describe('マイページ', () => {
   test.describe('タスク0件', () => {
     test.use({ storageState: '.auth/user6.json' });
-    test('表示', async ({ page }) => {
+    test('基本要素が表示されていること', async ({ page }) => {
       await page.goto(`${process.env.BASE_URL!}/`);
       await page.getByRole('link', { name: 'My Page' }).click();
       await page.waitForURL(`${process.env.BASE_URL!}/mypage`);
@@ -16,7 +16,7 @@ test.describe('マイページ', () => {
       await expect(page.getByText('タスク総数：')).toBeVisible();
       await expect(page.getByText('完了率：')).toBeVisible();
     });
-    test('スタッツ', async ({ page }) => {
+    test('スタッツの値が正しいこと', async ({ page }) => {
       await page.goto(`${process.env.BASE_URL!}/`);
 
       // 一覧にタスクが一件も無いことを確認
@@ -31,7 +31,7 @@ test.describe('マイページ', () => {
   });
   test.describe('タスクN件：すべて未完了', () => {
     test.use({ storageState: '.auth/user7.json' });
-    test('スタッツ', async ({ page }) => {
+    test('スタッツの値が正しいこと', async ({ page }) => {
       const task = 'ユーザー7：マイページのスタッツ確認タスク_';
       // タスクを10件登録
       for (let i = 0; i < 10; i++) {
@@ -58,7 +58,7 @@ test.describe('マイページ', () => {
 
   test.describe('タスクN件：完了率50%', () => {
     test.use({ storageState: '.auth/user8.json' });
-    test('スタッツ', async ({ page }) => {
+    test('スタッツの値が正しいこと', async ({ page }) => {
       const task = 'ユーザー8：マイページのスタッツ確認タスク_';
       // タスクを10件登録
       for (let i = 0; i < 10; i++) {
@@ -84,7 +84,7 @@ test.describe('マイページ', () => {
   });
   test.describe('タスクN件：完了率100%', () => {
     test.use({ storageState: '.auth/user9.json' });
-    test('スタッツ', async ({ page }) => {
+    test('スタッツの値が正しいこと', async ({ page }) => {
       const task = 'ユーザー9：マイページのスタッツ確認タスク_';
       // タスクを10件登録
       for (let i = 0; i < 10; i++) {
@@ -106,6 +106,18 @@ test.describe('マイページ', () => {
       await expect(page.locator('#rate')).toHaveText('100%');
 
       await deleteAllTasks(page);
+    });
+  });
+  test.describe('基本動作確認', () => {
+    test.use({ storageState: '.auth/user9.json' });
+    test('戻るボタン押下でタスク一覧画面に遷移すること', async ({ page }) => {
+      await page.goto(`${process.env.BASE_URL!}/`);
+      await page.getByRole('link', { name: 'My Page' }).click();
+      await page.waitForURL(`${process.env.BASE_URL!}/mypage`);
+
+      await page.getByRole('link', { name: '← 戻る' }).click();
+      await page.waitForURL(`${process.env.BASE_URL!}/`);
+      await expect(page.getByRole('heading', { name: 'タスク一覧' })).toBeVisible();
     });
   });
 });

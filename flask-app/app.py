@@ -210,3 +210,20 @@ def api_stats():
         "task_count": total,
         "done_rate": done_rate
     })
+
+
+# -----------------------------
+# API：テスト用DB設定
+# -----------------------------
+@app.route("/api/test/setup", methods=["POST"])
+def api_test_setup():
+    data = request.get_json()
+    total = data.get("total", 0)
+    done = data.get("done", 0)
+
+    user_id = 10  # テスト用ユーザーを固定する
+
+    db.clear_tasks_for_user(user_id)
+    db.create_tasks_for_user(user_id, total, done)
+
+    return jsonify({ "ok": True })

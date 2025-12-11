@@ -52,6 +52,8 @@ def init_db():
         ensure_user("test7", "pass123")
         ensure_user("test8", "pass123")
         ensure_user("test9", "pass123")
+        ensure_user("test10", "pass123")
+        ensure_user("test11", "pass123")
 
         conn.commit()
 
@@ -138,3 +140,22 @@ def count_done_tasks_by_user(user_id):
         c = conn.cursor()
         c.execute("SELECT COUNT(*) FROM tasks WHERE user_id = ? AND done = 1", (user_id,))
         return c.fetchone()[0]
+
+
+
+def clear_tasks_for_user(user_id):
+    with closing(get_connection()) as conn:
+        c = conn.cursor()
+        c.execute("DELETE FROM tasks WHERE user_id = ?", (user_id,))
+        conn.commit()
+
+def create_tasks_for_user(user_id, total, done):
+    with closing(get_connection()) as conn:
+        c = conn.cursor()
+        for i in range(total):
+            is_done = 1 if i < done else 0
+            c.execute(
+                "INSERT INTO tasks (title, done, user_id) VALUES (?, ?, ?)",
+                (f"task-{i}", is_done, user_id)
+            )
+        conn.commit()

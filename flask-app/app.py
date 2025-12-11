@@ -135,9 +135,16 @@ def edit(task_id):
 
     if request.method == "POST":
         title = request.form.get("title")
-        done = 1 if request.form.get("done") == "on" else 0
-        db.update_task(task_id, title, done, current_user.id)
-        return redirect(url_for("index"))
+        if not title:
+            return render_template(
+                "edit.html", 
+                error="タスクを入力してください",
+                task=task
+            )
+        if title:
+            done = 1 if request.form.get("done") == "on" else 0
+            db.update_task(task_id, title, done, current_user.id)
+            return redirect(url_for("index"))
 
     return render_template("edit.html", task=task)
 

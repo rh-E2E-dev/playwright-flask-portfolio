@@ -203,7 +203,8 @@ def api_stats():
     total = db.count_tasks_by_user(user_id)
     done = db.count_done_tasks_by_user(user_id)
 
-    done_rate = done / total if total > 0 else 0
+    ratio = done / total if total > 0 else 0
+    done_rate = min(1, ratio)
 
     return jsonify({
         "username": current_user.username,

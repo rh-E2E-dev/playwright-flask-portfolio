@@ -55,7 +55,6 @@ test.describe('マイページ', () => {
       }
     });
   });
-
   test.describe('タスクN件：完了率50%', () => {
     test.use({ storageState: '.auth/user8.json' });
     test('スタッツの値が正しいこと', async ({ page }) => {

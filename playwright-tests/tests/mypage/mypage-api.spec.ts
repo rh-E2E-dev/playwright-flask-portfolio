@@ -32,7 +32,6 @@ test.describe.serial('APIテスト', () => {
 
         expect(Math.round(data.done_rate * 100)).toBe(33);
       });
-
       test('done_rateの値が67%になること', async ({ authedAPI }) => {
         // DB のセットアップ
         await authedAPI.post('/api/test/setup', {
@@ -47,7 +46,6 @@ test.describe.serial('APIテスト', () => {
 
         expect(Math.round(data.done_rate * 100)).toBe(67);
       });
-
       test('done_rateの値が100%になること', async ({ authedAPI }) => {
         // DB のセットアップ
         await authedAPI.post('/api/test/setup', {
@@ -62,7 +60,6 @@ test.describe.serial('APIテスト', () => {
 
         expect(Math.round(data.done_rate * 100)).toBe(100);
       });
-
       test('done_rateの値が50%になること_大きな値', async ({ authedAPI }) => {
         // DB のセットアップ
         await authedAPI.post('/api/test/setup', {
@@ -78,6 +75,7 @@ test.describe.serial('APIテスト', () => {
         expect(Math.round(data.done_rate * 100)).toBe(50);
       });
     });
+
     test.describe('異常系', () => {
       test('total < done の場合は100%になること', async ({ authedAPI }) => {
         // DB のセットアップ
@@ -94,7 +92,6 @@ test.describe.serial('APIテスト', () => {
 
         expect(Math.round(data.done_rate * 100)).toBe(100); // 最大100%に丸める仕様のため
       });
-
       test('totalやdoneが未定義やnullでも0%として返されること_1', async ({ authedAPI }) => {
         // DB のセットアップ
         await authedAPI.post('/api/test/setup', {
@@ -111,7 +108,6 @@ test.describe.serial('APIテスト', () => {
         expect(Math.round(data.done_rate * 100)).toBe(0);
         expect(data.task_count).toBe(0);
       });
-
       test('totalやdoneが未定義やnullでも0%として返されること_2', async ({ authedAPI }) => {
         // DB のセットアップ
         await authedAPI.post('/api/test/setup', {
@@ -143,7 +139,6 @@ test.describe.serial('APIテスト', () => {
         expect(res.status()).toBe(302);
         expect(res.headers()['location']).toContain('/login');
       });
-
       test('ログイン済みなら200が返ること', async ({ authedAPI }) => {
         const res = await authedAPI.get('/api/stats');
         expect(res.status()).toBe(200);
@@ -163,7 +158,6 @@ test.describe.serial('APIテスト', () => {
         expect(data).toHaveProperty('task_count');
         expect(data).toHaveProperty('done_rate');
       });
-
       test('done_rateとtask_countの値がnumber型であること', async ({ authedAPI }) => {
         const res = await authedAPI.get('/api/stats');
         expect(res.ok()).toBeTruthy();
@@ -209,7 +203,6 @@ test.describe.serial('APIテスト', () => {
 
 test.describe('マイページ（APIモック）', () => {
   test.use({ storageState: '.auth/user11.json' });
-
   test.describe('フォーマット', () => {
     test('表示フォーマットが正しいこと', async ({ page }) => {
       await page.route('**/api/stats', async (route) => {
@@ -257,8 +250,7 @@ test.describe('マイページ（APIモック）', () => {
       await expect(page.locator('#count')).toHaveText('10');
       await expect(page.locator('#rate')).toHaveText('99%');
     });
-
-    test('完了率が少数になる場合の表示が正しいこと', async ({ page }) => {
+    test('完了率が小数になる場合の表示が正しいこと', async ({ page }) => {
       await page.route('**/api/stats', async (route) => {
         await route.fulfill({
           status: 200,
@@ -305,7 +297,6 @@ test.describe('マイページ（APIモック）', () => {
       await expect(page.locator('#count')).toHaveText('0');
       await expect(page.locator('#rate')).toHaveText('0%');
     });
-
     test('タスク総数が100000の場合の表示が正しいこと', async ({ page }) => {
       await page.route('**/api/stats', async (route) => {
         await route.fulfill({
@@ -353,7 +344,6 @@ test.describe('マイページ（APIモック）', () => {
       await expect(page.locator('#count')).toHaveText('10');
       await expect(page.locator('#rate')).toHaveText('50%');
     });
-
     test('ユーザー名が半角記号でも正しく表示されること', async ({ page }) => {
       await page.route('**/api/stats', async (route) => {
         await route.fulfill({
@@ -376,7 +366,6 @@ test.describe('マイページ（APIモック）', () => {
       await expect(page.locator('#count')).toHaveText('10');
       await expect(page.locator('#rate')).toHaveText('50%');
     });
-
     test('ユーザー名が日本語 + 半角英数記号でも正しく表示されること', async ({ page }) => {
       await page.route('**/api/stats', async (route) => {
         await route.fulfill({
@@ -399,7 +388,6 @@ test.describe('マイページ（APIモック）', () => {
       await expect(page.locator('#count')).toHaveText('10');
       await expect(page.locator('#rate')).toHaveText('50%');
     });
-
     test('ユーザー名が100文字でも正しく表示されること', async ({ page }) => {
       await page.route('**/api/stats', async (route) => {
         await route.fulfill({
@@ -426,7 +414,6 @@ test.describe('マイページ（APIモック）', () => {
       await expect(page.locator('#count')).toHaveText('10');
       await expect(page.locator('#rate')).toHaveText('50%');
     });
-
     test('ユーザー名が空文字でも正しく表示されること', async ({ page }) => {
       await page.route('**/api/stats', async (route) => {
         await route.fulfill({
@@ -450,6 +437,7 @@ test.describe('マイページ（APIモック）', () => {
       await expect(page.locator('#rate')).toHaveText('50%');
     });
   });
+
   test.describe('運用系', () => {
     test('APIエラー時にUIがクラッシュしないこと', async ({ page }) => {
       page.route('**/api/stats', (route) => route.abort());
@@ -459,8 +447,7 @@ test.describe('マイページ（APIモック）', () => {
       await expect(page.locator('#count')).toHaveText('');
       await expect(page.locator('#rate')).toHaveText('');
     });
-
-    test('セッションタイムアウト時の動作確認', async ({ page }) => {
+    test('セッションタイムアウト時に操作を続行できること', async ({ page }) => {
       await page.route('**/api/stats', async (route) => {
         route.fulfill({
           status: 401,

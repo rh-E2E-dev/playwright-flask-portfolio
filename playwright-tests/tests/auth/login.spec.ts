@@ -18,6 +18,7 @@ test.describe('ログイン', () => {
       await expect(page).toHaveURL(`${process.env.BASE_URL!}/`);
     });
   });
+
   test.describe('動作（異常系）', () => {
     test.describe('未入力', () => {
       test('ユーザー名、パスワード共に未入力で未入力エラーが表示されること', async ({ page }) => {
@@ -38,6 +39,7 @@ test.describe('ログイン', () => {
         await expect(page.getByText(/ユーザー名とパスワードを入力してください/)).toBeVisible();
       });
     });
+
     test.describe('不正', () => {
       test('ユーザー名、パスワード共に不正でログインエラーが表示されること', async ({ page }) => {
         await page.goto(`${process.env.BASE_URL!}/login`);

@@ -33,6 +33,7 @@ test.describe('未ログイン状態', () => {
       await expect(page).toHaveURL(`${process.env.BASE_URL!}/login?next=${redirectExcapes.mypage}`);
     });
   });
+
   test.describe('操作系URLへの直接アクセス', () => {
     test('タスク削除_ID有（/delete/id）はログイン画面にリダイレクトされること', async ({
       page,
@@ -89,6 +90,7 @@ test.describe('ログイン状態', () => {
       await expect(page).toHaveURL(`${process.env.BASE_URL!}/mypage`);
     });
   });
+
   test.describe('操作系URLへの直接アクセス', () => {
     test('タスク削除_ID有（/delete/id）はタスク削除が実行されること', async ({ page }) => {
       const taskName = '全画面スモーク タスク削除：ID有 ユーザー1';
@@ -112,6 +114,7 @@ test.describe('ログイン状態', () => {
       await expect(page).toHaveURL(`${process.env.BASE_URL!}/login?next=${redirectExcapes.root}`);
     });
   });
+
   test.describe('異常系', () => {
     test('タスク編集_存在しないID(/edit/id)はNotFoundが表示されること', async ({ page }) => {
       const ids = await getExistingTaskIds(page);

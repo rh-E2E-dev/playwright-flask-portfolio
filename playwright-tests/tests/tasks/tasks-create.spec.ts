@@ -9,6 +9,7 @@ test.describe('タスク新規作成画面', () => {
     await expect(page.getByRole('textbox', { name: '入力してください' })).toBeEmpty();
     await expect(page.getByRole('button', { name: '作成' })).toBeEnabled();
   });
+
   test.describe('新規作成', () => {
     test.describe('動作（正常系）', () => {
       test('タスク新規作成を完了できること', async ({ page }) => {
@@ -21,6 +22,7 @@ test.describe('タスク新規作成画面', () => {
         await deleteTask(page, task);
       });
     });
+
     test.describe('動作（異常系）', () => {
       test('タスク名を未入力で未入力エラーが表示されること', async ({ page }) => {
         await page.goto(`${process.env.BASE_URL!}/new`);

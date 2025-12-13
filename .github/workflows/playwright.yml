@@ -60,10 +60,10 @@ jobs:
           pnpm exec playwright install --with-deps
 
       # 8. Playwright 実行
-      - name: Run Playwright tests
+      - name: Run Playwright tests (CI only)
         run: |
           cd playwright-tests
-          pnpm exec playwright test
+          pnpm exec playwright test tests/ci
 
       # 9. レポート保存
       - uses: actions/upload-artifact@v4

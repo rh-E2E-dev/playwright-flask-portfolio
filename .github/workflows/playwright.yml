@@ -14,6 +14,13 @@ jobs:
       BASE_URL: http://localhost:5000
       FLASK_ENV: development
       SECRET_KEY: ci-secret-key
+      BASE_URL: http://127.0.0.1:5000
+      # テスト用ユーザー情報
+      USERS: user1,user2
+      NAME_user1: test1
+      PASSWORD_user1: pass123
+      NAME_user2: テスト2
+      PASSWORD_user2: pass456
 
     steps:
       # 1. リポジトリ取得

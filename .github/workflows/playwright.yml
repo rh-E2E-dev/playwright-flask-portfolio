@@ -1,28 +1,68 @@
 name: Playwright Tests
+
 on:
   push:
     branches: [main, master]
-  pull_request:
-    branches: [main, master]
   workflow_dispatch:
+
 jobs:
   test:
-    timeout-minutes: 60
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      BASE_URL: http://localhost:5000
+      FLASK_ENV: development
+      SECRET_KEY: ci-secret-key
+
     steps:
+      # 1. リポジトリ取得
       - uses: actions/checkout@v4
+
+      # 2. Node.js セットアップ
       - uses: actions/setup-node@v4
         with:
           node-version: lts/*
-      - name: Install dependencies
-        run: npm install -g pnpm && pnpm install
-      - name: Install Playwright Browsers
-        run: pnpm exec playwright install --with-deps
+
+      # 3. Python セットアップ
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      # 4. Flask 依存関係インストール
+      - name: Install Flask dependencies
+        run: |
+          cd flask-app
+          pip install -r requirements.txt
+
+      # 5. Flask 起動（バックグラウンド）
+      - name: Start Flask app
+        run: |
+          cd flask-app
+          python app.py &
+
+      # 6. 少し待つ（←重要）
+      - name: Wait for Flask
+        run: sleep 3
+
+      # 7. Playwright 依存関係インストール
+      - name: Install Playwright dependencies
+        run: |
+          cd playwright-tests
+          npm install -g pnpm
+          pnpm install
+          pnpm exec playwright install --with-deps
+
+      # 8. Playwright 実行
       - name: Run Playwright tests
-        run: pnpm exec playwright test
+        run: |
+          cd playwright-tests
+          pnpm exec playwright test
+
+      # 9. レポート保存
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
           name: playwright-report
-          path: playwright-report/
+          path: playwright-tests/playwright-report/
           retention-days: 30

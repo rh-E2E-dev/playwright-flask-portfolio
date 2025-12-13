@@ -61,7 +61,7 @@ playwright-flask-portforio/
                 login.spec.ts ※ログイン画面のテスト
             fixtures/ ※テストで利用するフィクスチャーを格納
                 apiClient.ts ※認証済み API を準備するファイル
-            hlepers/ ※テストで利用するヘルパーを格納
+            helpers/ ※テストで利用するヘルパーを格納
                     auth.setup.ts ※ログイン認証保持を実装したファイル
                     tasks.ts ※各テストで頻繁に利用する関数を定義したファイル
             mypage/
@@ -73,13 +73,13 @@ playwright-flask-portforio/
                 tasks-list.spec.ts ※タスク一覧画面のテスト（画面が存在しないタスク削除のテストを含む）
                 tasks-create.spec.ts ※新規作成画面のテスト
                 tasks-edit.spec.ts ※タスク編集画面のテスト
-            visul/
+            visual/
                 mypage-basic-v.spec.ts ※マイページのビジュアルリグレッション（簡易）
                 tasks-list.spec-v.ts ※タスク一覧画面のビジュアルリグレッション（簡易）
         ci/ ※CI 用にテストを切り出し
             auth/
                 login.spec.ts ※ログイン画面のテスト
-            hlepers/ ※テストで利用するヘルパーを格納
+            helpers/ ※テストで利用するヘルパーを格納
                 auth.setup.ts ※ログイン認証保持を実装したファイル
                 tasks.ts ※各テストで頻繁に利用する関数を定義したファイル
             smoke/
@@ -112,7 +112,6 @@ CI では時間短縮の意味もあり、最小限の E2E（Chromium headless�
 3. テスト実行  
    pnpm exec playwright test
 4. Allure レポート生成・確認  
-   pnpm exec playwright test  
    pnpm exec allure generate  
    pnpm exec allure open
 

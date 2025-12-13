@@ -170,10 +170,6 @@ def delete(task_id):
     return redirect(url_for("index"))
 
 
-if __name__ == "__main__":
-    app.run(debug=True, port=5100)
-
-
 # -----------------------------
 # タスク削除（認証必須）_IDなしの場合リダイレクト
 # -----------------------------

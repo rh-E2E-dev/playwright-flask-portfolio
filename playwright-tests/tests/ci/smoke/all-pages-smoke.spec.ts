@@ -58,6 +58,12 @@ test.describe('ログイン状態', () => {
   test.use({ storageState: '.auth/user1.json' });
   test.describe('画面遷移', () => {
     test('タスク一覧画面（/）に遷移すること', async ({ page }) => {
+      test
+        .info()
+        .annotations.push(
+          { type: 'feature', description: 'CI 全画面スモーク' },
+          { type: 'story', description: 'タスク一覧画面表示' },
+        );
       await page.goto(`${process.env.BASE_URL!}/`);
       await expect(page).toHaveURL(`${process.env.BASE_URL!}/`);
     });

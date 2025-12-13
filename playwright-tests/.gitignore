@@ -1,9 +1,13 @@
-
 # Playwright
 node_modules/
 .auth/*
 !.auth/.gitkeep
 .cache/
+allure-results/
 /test-results/
 /playwright-report/
 /blob-report/
+
+# Allure
+allure-results/
+allure-report/

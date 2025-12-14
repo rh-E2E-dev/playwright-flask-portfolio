@@ -113,12 +113,17 @@ CI では時間短縮の意味もあり、最小限の E2E（Chromium headless�
 これは、テストケース自体が機能単位・観点単位で整理されており、過度な annotation を付与しなくてもレポートとして十分に可読性を保てる構成になっているためです。  
 実務では、規模や運用体制に応じて step / severity / feature の付与を検討する想定です。
 
+レポートは GitHub Pages 上で確認できるようにしています。
+
+- Allure レポート  
+  https://xxxx.github.io/yyyy/
+
 ## 実行方法
 
 ※node, pnpm 導入環境にて
 
 1. リポジトリを clone  
-   git clone https://github.com/xxxx/playwright-flask-portfolio.git
+   git clone https://github.com/rh-E2E-dev/playwright-flask-portfolio.git
 2. 依存関係をインストール  
    cd playwright-tests  
    pnpm install  

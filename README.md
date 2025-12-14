@@ -1,4 +1,4 @@
-# E2E ポートフォリオ
+![Playwright E2E Portfolio](docs/images/sample.png)
 
 ## 概要
 
